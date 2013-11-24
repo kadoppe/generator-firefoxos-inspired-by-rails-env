@@ -4,7 +4,7 @@ var path = require('path');
 var yeoman = require('yeoman-generator');
 
 
-var FirefoxosInspiredByRailsEnvGenerator = module.exports = function FirefoxosInspiredByRailsEnvGenerator(args, options, config) {
+var Generator = module.exports = function Generator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
 
   this.on('end', function () {
@@ -14,37 +14,45 @@ var FirefoxosInspiredByRailsEnvGenerator = module.exports = function FirefoxosIn
   this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
 };
 
-util.inherits(FirefoxosInspiredByRailsEnvGenerator, yeoman.generators.Base);
+util.inherits(Generator, yeoman.generators.Base);
 
-FirefoxosInspiredByRailsEnvGenerator.prototype.askFor = function askFor() {
-  var cb = this.async();
-
-  // have Yeoman greet the user.
-  console.log(this.yeoman);
-
-  var prompts = [{
-    type: 'confirm',
-    name: 'someOption',
-    message: 'Would you like to enable this option?',
-    default: true
-  }];
-
-  this.prompt(prompts, function (props) {
-    this.someOption = props.someOption;
-
-    cb();
-  }.bind(this));
+Generator.prototype.packageJSON = function packageJSON() {
+  this.copy('_package.json', 'package.json');
 };
 
-FirefoxosInspiredByRailsEnvGenerator.prototype.app = function app() {
-  this.mkdir('app');
-  this.mkdir('app/templates');
-
-  this.copy('_package.json', 'package.json');
+Generator.prototype.bower = function bower() {
   this.copy('_bower.json', 'bower.json');
 };
 
-FirefoxosInspiredByRailsEnvGenerator.prototype.projectfiles = function projectfiles() {
-  this.copy('editorconfig', '.editorconfig');
+Generator.prototype.jshint = function jshint() {
   this.copy('jshintrc', '.jshintrc');
+};
+
+Generator.prototype.editorConfig = function editorConfig() {
+  this.copy('editorconfig', '.editorconfig');
+};
+
+Generator.prototype.app = function app() {
+  this.mkdir('app');
+  this.mkdir('app/templates');
+};
+
+Generator.prototype.firefoxosBoilerplate = function firefoxosBoilerplate() {
+  var dirName = 'firefoxos-boilerplate';
+  var files = this.expandFiles('**/*', {
+    cwd: this.sourceRoot() + '/' + dirName, dot: true }
+  );
+  var ignores = [
+    '.git',
+    'LICENSE',
+    'README.md',
+  ];
+
+  files.forEach(function(file) {
+    if (ignores.indexOf(file) !== -1) {
+      return;
+    }
+
+    this.copy(dirName + '/' + file, 'app/' + file);
+  }, this);
 };
