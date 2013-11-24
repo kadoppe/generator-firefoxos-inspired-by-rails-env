@@ -1,0 +1,3 @@
+[submodule "app/templates/firefoxos-boilerplate"]
+	path = app/templates/firefoxos-boilerplate
+	url = https://github.com/robnyman/Firefox-OS-Boilerplate-App
